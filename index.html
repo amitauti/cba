@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Price Comparison App</title>
+</head>
+<body>
+<h1>Price Comparison App</h1>
+<form action="/compare" method="post">
+<input type="text" name="product_name" placeholder="Product Name">
+<input type="submit" value="Compare Prices">
+</form>
+
+<script>
+// This function gets the product name from the form and compares the prices in Hong Kong and India.
+function comparePrices() {
+  var productName = document.getElementById("product_name").value;
+  var hongKongPrice = getPrice(productName, "hk");
+  var indiaPrice = getPrice(productName, "in");
+
+  // Calculate the shipping cost for India.
+  var shippingCost = 450;
+
+  // Calculate the total cost for each product.
+  var hongKongTotalCost = hongKongPrice + shippingCost;
+  var indiaTotalCost = indiaPrice + shippingCost;
+
+  // Display the results to the user.
+  document.getElementById("results").innerHTML = `
+    <h2>Product Name: ${productName}</h2>
+    <h3>Hong Kong Price: ${hongKongPrice}</h3>
+    <h3>India Price: ${indiaPrice}</h3>
+    <h3>Hong Kong Total Cost: ${hongKongTotalCost}</h3>
+    <h3>India Total Cost: ${indiaTotalCost}</h3>
+  `;
+}
+
+// This function gets the price of a product from the database.
+function getPrice(productName, country) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", `/api/products/${productName}/${country}`);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var price = JSON.parse(xhr.responseText).price;
+      return price;
+    } else {
+      console.log("Error getting price: " + xhr.status);
+      return null;
+    }
+  };
+  xhr.send();
+}
+</script>
+
+<div id="results"></div>
+</body>
+</html>
